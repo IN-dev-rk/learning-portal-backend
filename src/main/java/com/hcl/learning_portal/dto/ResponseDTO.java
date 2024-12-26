@@ -2,23 +2,23 @@ package com.hcl.learning_portal.dto;
 
 public class ResponseDTO<T> {
 
-    private String status;
+    private int status;
     private String message;
     private T data;
 
     public ResponseDTO() {}
 
-    public ResponseDTO(String status, String message, T data) {
+    public ResponseDTO(int status, String message, T data) {
         this.status = status;
         this.message = message;
         this.data = data;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

@@ -1,5 +1,6 @@
 package com.hcl.learning_portal.config;
 
+import com.hcl.learning_portal.handler.CustomAccessDeniedHandler;
 import com.hcl.learning_portal.service.MyUserDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,9 @@ public class SecurityConfig {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
+    @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
+
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -35,7 +39,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .exceptionHandling(exception -> {
+                    exception.authenticationEntryPoint(unauthorizedHandler);
+                    exception.accessDeniedHandler(accessDeniedHandler);
+                })
                 .authorizeHttpRequests()
                 .antMatchers("/api/v1/auth/**").permitAll()
                 .anyRequest().authenticated()
@@ -51,7 +58,7 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(myUserDetailService);
-        provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+        provider.setPasswordEncoder(new BCryptPasswordEncoder(12));
         return provider;
     }
 

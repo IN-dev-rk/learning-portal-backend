@@ -1,6 +1,7 @@
 package com.hcl.learning_portal.utils;
 
 import com.hcl.learning_portal.model.UserModel;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,6 +30,7 @@ public class JwtUtil {
     public String generateToken(UserModel userModel) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", userModel.getId());
+        claims.put("email", userModel.getEmail());
         claims.put("role", userModel.getRole());
         return Jwts.builder()
                 .addClaims(claims)
@@ -46,6 +48,16 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public String extractClaim(String token, String claimKey) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get(claimKey, String.class);
     }
 
     public boolean validateToken(String token) {

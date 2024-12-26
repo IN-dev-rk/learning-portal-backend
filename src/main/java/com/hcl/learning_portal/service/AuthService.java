@@ -1,5 +1,6 @@
 package com.hcl.learning_portal.service;
 
+import com.hcl.learning_portal.constant.Constants;
 import com.hcl.learning_portal.dto.LoginDTO;
 import com.hcl.learning_portal.dto.ResponseDTO;
 import com.hcl.learning_portal.model.UserModel;
@@ -21,9 +22,6 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
-
     @Autowired
     UserRepository userRepository;
 
@@ -39,16 +37,20 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = "";
+            if(!authentication.isAuthenticated()) {
+                ResponseDTO<String> responseDTO = new ResponseDTO<>(401, Constants.BAD_CREDENTIALS_MESSAGE, "");
+                return ResponseEntity.status(401).body(responseDTO);
+            }
             if (authentication.isAuthenticated()) {
                 Optional<UserModel> userModel = userRepository.findByEmail(loginDTO.getEmail());
                 if (userModel.isPresent()) {
                     token = jwtUtil.generateToken(userModel.get());
                 }
             }
-            ResponseDTO<String> responseDTO = new ResponseDTO<>("true", "Token Generated Successfully!", token);
+            ResponseDTO<?> responseDTO = new ResponseDTO<>(200, Constants.TOKEN_GENERATE_MESSAGE, token);
             return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
-            ResponseDTO<String> responseDTO = new ResponseDTO<>("false", "Internal Server Error", e.getMessage());
+            ResponseDTO<?> responseDTO = new ResponseDTO<>(500, e.getMessage(), null);
             return ResponseEntity.ok().body(responseDTO);
         }
     }
