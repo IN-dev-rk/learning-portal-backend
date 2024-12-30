@@ -1,5 +1,6 @@
 package com.hcl.learning_portal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,6 +21,7 @@ public class UserModel {
     @Column(unique = true)
     private String username;
 
+    @JsonIgnore
     private String password;
 
     private String email;
